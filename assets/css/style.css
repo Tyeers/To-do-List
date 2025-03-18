@@ -1,0 +1,46 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+.container {
+    max-width: 1200px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+h2 {
+    text-align: center;
+    color: #343a40;
+}
+.btn {
+    margin: 5px;
+}
+table {
+    background: #fff;
+}
+th {
+    background: #007bff;
+    color: white;
+}
+.status-selesai {
+    color: green;
+    font-weight: bold;
+}
+.status-belum {
+    color: red;
+    font-weight: bold;
+}
+
+/* @media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 10px;
+    }
+    table {
+        font-size: 14px;
+    }
+    th, td {
+        padding: 5px;
+    }
+} */
