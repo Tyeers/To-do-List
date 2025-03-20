@@ -271,8 +271,100 @@
             </div>
         </div>
     </div>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    $(document).ready(function() {
+        // Add click handler to task names
+        $(".table tbody tr td:nth-child(2)").addClass("task-name-cell").click(function() {
+            let taskId = $(this).closest("tr").find("a.btn-warning").attr("href").split("=")[1];
+            showTaskDetails(taskId);
+        });
+    });
+
+    function showTaskDetails(taskId) {
+        // Fetch task details using AJAX
+        $.ajax({
+            url: '../controllers/taskController.php',
+            type: 'GET',
+            data: {
+                get_task_details: taskId
+            },
+            dataType: 'json',
+            success: function(response) {
+                if(response.success) {
+                    const task = response.data;
+                    
+                    // Create and show modal with task details
+                    const modal = `
+                    <div class="modal fade" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="taskDetailModalLabel">Detail Tugas</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h4 class="task-title">${task.task}</h4>
+                                    <div class="task-detail-container">
+                                        <div class="detail-row">
+                                            <div class="detail-label">Prioritas:</div>
+                                            <div class="detail-value">
+                                                <span class="priority-badge priority-${task.priority.toLowerCase()}">${task.priority}</span>
+                                            </div>
+                                        </div>
+                                        <div class="detail-row">
+                                            <div class="detail-label">Deadline:</div>
+                                            <div class="detail-value">
+                                                <span class="date-badge">${task.due_date}</span>
+                                            </div>
+                                        </div>
+                                        <div class="detail-row">
+                                            <div class="detail-label">Status:</div>
+                                            <div class="detail-value">
+                                                <span class="status-badge ${task.status == 1 ? 'status-complete' : 'status-incomplete'}">
+                                                    ${task.status == 1 ? 'Selesai' : 'Belum Selesai'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        ${task.description ? `
+                                        <div class="detail-row">
+                                            <div class="detail-label">Deskripsi:</div>
+                                            <div class="detail-value description-text">${task.description}</div>
+                                        </div>
+                                        ` : ''}
+                                        <div class="detail-row">
+                                            <div class="detail-label">Dibuat pada:</div>
+                                            <div class="detail-value">${task.created_at}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="edit_task.php?id=${task.id}" class="btn btn-warning">Edit</a>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    
+                    // Remove any existing modal first
+                    $("#taskDetailModal").remove();
+                    $("body").append(modal);
+                    
+                    // Initialize and show modal
+                    const modalElement = new bootstrap.Modal(document.getElementById('taskDetailModal'));
+                    modalElement.show();
+                } else {
+                    alert("Gagal memuat detail tugas");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching task details:", error);
+                alert("Terjadi kesalahan saat memuat detail tugas");
+            }
+        });
+    }
+    
     function toggleStatus(taskId, currentStatus) {
         let newStatus = currentStatus == 1 ? 0 : 1;
         $.ajax({
