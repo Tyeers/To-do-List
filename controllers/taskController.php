@@ -74,3 +74,29 @@ if (isset($_POST['toggle_status'])) {
         echo "Error: {$query}<br>{$conn->error}";
     }
 }
+
+// Endpoint to get task details
+if(isset($_GET['get_task_details'])) {
+    $task_id = $_GET['get_task_details'];
+    
+    // Prepare query
+    $query = "SELECT * FROM task WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $task_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if($result->num_rows > 0) {
+        $task = $result->fetch_assoc();
+        echo json_encode([
+            'success' => true,
+            'data' => $task
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Task not found'
+        ]);
+    }
+    exit;
+}
