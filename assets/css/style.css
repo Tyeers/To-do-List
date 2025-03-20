@@ -21,7 +21,7 @@
   }
   
   .container {
-    max-width: 1200px;
+    max-width: 1300px;
     padding: 20px;
   }
   
@@ -418,4 +418,59 @@
 /* Task list container */
 .task-container {
     overflow-x: auto;
+}
+
+/* Make task name cell appear clickable */
+.task-name-cell {
+  cursor: pointer;
+  color: #0066cc;
+  transition: all 0.2s;
+}
+
+.task-name-cell:hover {
+  text-decoration: underline;
+  color: #004d99;
+}
+
+/* Detail modal styling */
+.task-detail-container {
+  margin-top: 15px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.detail-label {
+  flex: 0 0 100px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.detail-value {
+  flex: 1;
+  color:#000000;
+}
+
+.description-text {
+  color: #000000;
+  white-space: pre-line;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.modal-title {
+  margin: 0;
+  color: var(--primary);
+}
+
+.task-title {
+  font-weight: 600;
+  color: #000000;
 }
