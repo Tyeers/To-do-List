@@ -8,6 +8,29 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .search-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .search-input {
+            position: relative;
+        }
+        .search-input .form-control {
+            padding-left: 40px;
+            height: 46px;
+        }
+        .search-input i {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
@@ -58,6 +81,32 @@
             </div>
         </div>
         
+        <!-- Search Bar Section (New) -->
+        <div class="search-container mb-4">
+            <form method="GET" action="index.php" id="searchForm">
+                <div class="search-input">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" name="search" placeholder="Search for tasks..." value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                    
+                    <!-- Preserve other parameters if they exist -->
+                    <?php
+                    if(isset($_GET['page'])) {
+                        echo '<input type="hidden" name="page" value="'.$_GET['page'].'">';
+                    }
+                    if(isset($_GET['priority'])) {
+                        echo '<input type="hidden" name="priority" value="'.$_GET['priority'].'">';
+                    }
+                    if(isset($_GET['status'])) {
+                        echo '<input type="hidden" name="status" value="'.$_GET['status'].'">';
+                    }
+                    if(isset($_GET['due_date'])) {
+                        echo '<input type="hidden" name="due_date" value="'.$_GET['due_date'].'">';
+                    }
+                    ?>
+                </div>
+            </form>
+        </div>
+        
         <div class="app-container">            
             <!-- Filter Section -->
             <div class="filter-container" id="filterContainer">
@@ -87,12 +136,13 @@
                             <label class="form-label">Deadline</label>
                             <input type="date" class="form-control" name="due_date" value="<?php echo isset($_GET['due_date']) ? $_GET['due_date'] : ''; ?>">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tugas</label>
-                            <input type="text" class="form-control" name="task_name" value="<?php echo isset($_GET['task_name']) ? $_GET['task_name'] : ''; ?>">
-                        </div>
 
+                        <!-- Preserve search parameter if it exists -->
                         <?php 
+                        if(isset($_GET['search'])) {
+                            echo '<input type="hidden" name="search" value="'.$_GET['search'].'">';
+                        }
+                        
                         // Preserve page parameter if it exists
                         if(isset($_GET['page'])) {
                             echo '<input type="hidden" name="page" value="'.$_GET['page'].'">';
@@ -133,6 +183,12 @@
                             // Base query
                             $query = "SELECT * FROM task WHERE 1=1";
                             
+                            // Apply search (new)
+                            if (isset($_GET['search']) && $_GET['search'] != '') {
+                                $search = $_GET['search'];
+                                $query .= " AND (task LIKE '%$search%' OR description LIKE '%$search%')";
+                            }
+                            
                             // Apply filters
                             if (isset($_GET['priority']) && $_GET['priority'] != '') {
                                 $priority = $_GET['priority'];
@@ -145,10 +201,6 @@
                             if (isset($_GET['due_date']) && $_GET['due_date'] != '') {
                                 $due_date = $_GET['due_date'];
                                 $query .= " AND due_date='$due_date'";
-                            }
-                            if (isset($_GET['task_name']) && $_GET['task_name'] != '') {
-                                $task_name = $_GET['task_name'];
-                                $query .= " AND task LIKE '%$task_name%'";
                             }
                             
                             // Order by
@@ -279,6 +331,17 @@
         $(".table tbody tr td:nth-child(2)").addClass("task-name-cell").click(function() {
             let taskId = $(this).closest("tr").find("a.btn-warning").attr("href").split("=")[1];
             showTaskDetails(taskId);
+        });
+        
+        // Auto-submit search form when typing
+        let typingTimer;
+        const doneTypingInterval = 500; // ms
+        
+        $('.search-container input[name="search"]').on('input', function() {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(function() {
+                $('#searchForm').submit();
+            }, doneTypingInterval);
         });
     });
 
